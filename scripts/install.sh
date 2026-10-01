@@ -22,3 +22,15 @@ scp dist/munchi-wave/standalone "$HOST:$DEST/standalone.new"
 scp scripts/boot-entry.sh "$HOST:$DEST/boot-entry.sh"
 ssh "$HOST" "chmod +x $DEST/standalone.new $DEST/boot-entry.sh && mv -f $DEST/standalone.new $DEST/standalone"
 echo "Installed to $DEST. Launch it from Schwung's Tools menu."
+
+# the sound generator: Signal Chain loads it by path, so it lives under
+# sound_generators/ (it picks up a new dsp.so the next time a slot loads it)
+SDEST=/data/UserData/schwung/modules/sound_generators/munchi-wave-synth
+if [ -d dist/munchi-wave-synth ]; then
+    ssh "$HOST" "mkdir -p $SDEST"
+    scp -r dist/munchi-wave-synth/card dist/munchi-wave-synth/module.json dist/munchi-wave-synth/help.json \
+        dist/munchi-wave-synth/LICENSE dist/munchi-wave-synth/THIRD_PARTY.md "$HOST:$SDEST/"
+    scp dist/munchi-wave-synth/dsp.so "$HOST:$SDEST/dsp.so.new"
+    ssh "$HOST" "mv -f $SDEST/dsp.so.new $SDEST/dsp.so"
+    echo "Installed the sound generator to $SDEST. Pick Munchi Wave as a slot's synth."
+fi

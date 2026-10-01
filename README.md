@@ -44,12 +44,24 @@ sequencer, presets and wavetables.
 | Menu | settings |
 | Back ×2 | exit |
 
+## As a Signal Chain synth
+
+The same engine also ships as a **sound generator** (`munchi-wave-synth`): load
+**Munchi Wave** into a Schwung slot's synth and Move plays it like any other
+synth — its tracks, its sequencer, a keyboard on USB-A — while the knob grid
+edits it and the slot keeps its state. It has WAVE's sound (tables, frames, DJ
+filter, both LFOs, delay/reverb, compressor) and its 14 presets, but not the
+CHOMPI's step sequencer or keyboard pages: in a chain, Move does that. It reads
+the same card as the tool, so tables and presets saved there show up in both.
+See [the manual](docs/MANUAL.md#15-as-a-signal-chain-synth).
+
 ## Install
 
-From a release: download `munchi-wave-module.tar.gz` from the
-[latest release](https://github.com/charlesvestal/schwung-munchi-wave/releases/latest/download/munchi-wave-module.tar.gz)
-and install it with the Schwung web manager's custom-module upload, or paste
-this repository's URL into its custom install. From a build:
+From a release: download `munchi-wave-module.tar.gz` (the tool) and/or
+`munchi-wave-synth-module.tar.gz` (the synth) from the
+[latest release](https://github.com/charlesvestal/schwung-munchi-wave/releases/latest)
+and install each with the Schwung web manager's custom-module upload. Pasting
+this repository's URL into the custom install installs the tool. From a build:
 
 ```bash
 ./scripts/build.sh      # fetches the factory card, cross-compiles in Docker
@@ -66,6 +78,8 @@ Then Tools menu (Shift + Volume + Step 13) → **Munchi Wave**.
 | `src/engine/munchi_wave.*` | the firmware's page logic (`NormalPage`, `MenuPage`, `ui.h`, `MidiManager`'s input), presets, options, wavetable loading, MIDI clock |
 | `src/engine/resampler.h` | the engine runs at its native 48 kHz; this converts to and from Move's 44.1 kHz |
 | `src/standalone/` | the SPI loop, the Move control mapping, lights and screen |
+| `src/synth/` | the sound generator: `plugin_api_v2`, its parameters, presets and state |
+| `src/engine/wave_card.*` | the card formats both read: presets.json and the wavetable folder |
 | `scripts/fetch-card.sh` | fetches the factory card from the CHOMPI repo at a pinned commit |
 | `tests/render.cpp` | offline harness: scripted key/knob/menu events in, a WAV out |
 

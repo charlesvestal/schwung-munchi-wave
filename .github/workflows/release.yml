@@ -39,12 +39,23 @@ jobs:
           echo "max GLIBC: $max"
           # Move ships glibc 2.35
           [ "$(printf '%s\n2.35\n' "$max" | sort -V | tail -1)" = "2.35" ]
+          # the sound generator
+          test -f dist/munchi-wave-synth-module.tar.gz
+          file dist/munchi-wave-synth/dsp.so | grep -q aarch64
+          test "$(ls dist/munchi-wave-synth/card/*.wav | wc -l)" -eq 7
+          # no STB_GNU_UNIQUE symbols: they pin the .so and a new build would
+          # not load until Move restarts
+          test "$(aarch64-linux-gnu-readelf -sW dist/munchi-wave-synth/dsp.so | grep -c UNIQUE)" -eq 0
+          smax=$(strings dist/munchi-wave-synth/dsp.so | grep -oE 'GLIBC_[0-9]+\.[0-9]+' | sed 's/GLIBC_//' | sort -V | tail -1)
+          [ "$(printf '%s\n2.35\n' "$smax" | sort -V | tail -1)" = "2.35" ]
 
       - name: Create GitHub release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/munchi-wave-module.tar.gz
+          files: |
+            dist/munchi-wave-module.tar.gz
+            dist/munchi-wave-synth-module.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

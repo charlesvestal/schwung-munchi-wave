@@ -1,0 +1,49 @@
+{
+  "title": "Munchi Wave",
+  "children": [
+    {
+      "title": "Overview",
+      "lines": [
+        "CHOMPI WAVE 1.0:",
+        "8-voice wavetable",
+        "synth with a DJ",
+        "filter, two LFOs,",
+        "delay and reverb.",
+        "",
+        "Jog: presets.",
+        "Same tables and",
+        "presets as the",
+        "Munchi Wave tool."
+      ]
+    },
+    {
+      "title": "Knobs",
+      "lines": [
+        "Main:",
+        "Table, Frame,",
+        "Filter, Resonance,",
+        "Attack, Release,",
+        "Space, Volume",
+        "",
+        "Space: left is",
+        "delay, right is",
+        "reverb."
+      ]
+    },
+    {
+      "title": "Pitch + LFOs",
+      "lines": [
+        "Pitch (semitones),",
+        "pitch LFO depth,",
+        "rate and on/off,",
+        "octave, filter",
+        "LFO depth, rate",
+        "and on/off.",
+        "",
+        "Output: delay time,",
+        "pan, compressor,",
+        "bend range."
+      ]
+    }
+  ]
+}

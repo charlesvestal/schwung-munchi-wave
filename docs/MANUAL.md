@@ -19,6 +19,7 @@ hardware.
 12. [The screen and the lights](#12-the-screen-and-the-lights)
 13. [Control reference](#13-control-reference)
 14. [Differences from a real CHOMPI](#14-differences-from-a-real-chompi)
+15. [As a Signal Chain synth](#15-as-a-signal-chain-synth)
 
 ---
 
@@ -293,3 +294,37 @@ the playing step and length, the tempo and the step length.
   has no looper, so a copy there just loaded the defaults; Play and Loop keep
   their sequencer jobs instead.
 - **No screen reader** while Munchi Wave owns the device.
+
+## 15. As a Signal Chain synth
+
+Munchi Wave also comes as a **sound generator**: install
+`munchi-wave-synth-module.tar.gz`, then in a Schwung slot choose **Munchi Wave**
+as the synth. Move plays it — its pads, its tracks and sequencer, or a keyboard
+on USB-A — and it sits in a chain with MIDI FX before it and audio FX after it.
+Several slots can each run their own.
+
+It is the same engine, with WAVE's sound and presets but none of the CHOMPI's
+keys: no step sequencer, no keyboard pages, no save keys. The slot saves its
+own state, and Schwung's **My Presets** page saves and recalls your own patches.
+
+**Presets.** The jog wheel on the synth's first page browses **Default Wave**
+and the card's presets. Choosing one sets every knob, as on the CHOMPI.
+
+**Knobs.**
+
+| Page | Knobs |
+|---|---|
+| Main | Table, Frame, Filter, Resonance, Attack, Release, Space, Volume |
+| Pitch + LFOs | Pitch (±12 st), pitch LFO depth, rate and on/off, Octave, filter LFO depth, rate and on/off |
+| Output | Delay time, Pan, Compressor, Bend range |
+
+Space is one knob for both effects: left of centre is delay, right is reverb.
+
+**The card.** The synth reads the same folder as the tool
+(`Samples/Schwung/Munchi Wave/`): the first seven `.wav` tables and
+`presets.json`. If that folder has no tables yet (the tool has never run), it
+uses the factory card shipped with the synth. Tables and presets are read when
+the synth loads; after changing them, reload the slot.
+
+**MIDI.** Notes at their real pitch (MIDI 60 is middle C), velocity, pitch bend
+(range on the Output page), and All Notes Off. 8 voices.

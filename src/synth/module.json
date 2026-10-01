@@ -1,0 +1,20 @@
+{
+    "id": "munchi-wave-synth",
+    "name": "Munchi Wave",
+    "abbrev": "MWAVE",
+    "version": "0.1.0",
+    "description": "CHOMPI WAVE 1.0 as a Signal Chain synth: an 8-voice wavetable synth with a DJ filter, pitch and filter LFOs, delay and reverb, and WAVE's 14 factory presets. Shares tables and presets with the Munchi Wave tool.",
+    "author": "CHOMPI Club / Chase Bliss (CHOMPI WAVE, MIT) · port: charlesvestal",
+    "license": "MIT",
+    "component_type": "sound_generator",
+    "dsp": "dsp.so",
+    "api_version": 2,
+    "capabilities": {
+        "audio_out": true,
+        "audio_in": false,
+        "midi_in": true,
+        "midi_out": false,
+        "chainable": true,
+        "component_type": "sound_generator"
+    }
+}

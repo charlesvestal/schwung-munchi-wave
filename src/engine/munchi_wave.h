@@ -14,6 +14,7 @@
 #include "wave/Sequencer.h"
 #include "wave/wave_hardware.h"
 #include "resampler.h"
+#include "wave_card.h"
 #include <atomic>
 #include <string>
 #include <thread>
@@ -50,26 +51,6 @@ struct WaveOptions
     bool midi_cc_in     = true;
     bool midi_cc_out    = true;
     bool pad_velocity   = false; // Munchi
-};
-
-/** PresetManager (WAVE): 14 slots x 14 controls, presets.json format v3. */
-struct WavePresets
-{
-    static constexpr int kSlots    = 14;
-    static constexpr int kControls = 14;
-    float slotValues[15][kControls];
-    bool  slotValid[15];
-    bool  updated = false;
-
-    void  Init(const float *defaults);
-    bool  IsValid(size_t slot);
-    float GetValue(size_t slot, size_t control);
-    void  SetValue(float value, size_t slot, size_t control);
-    void  Invalidate(uint8_t slot);
-    void  Save(size_t slot);
-    void  Copy(uint8_t src, uint8_t dst);
-    bool  Parse(const char *json);
-    std::string Serialize() const;
 };
 
 class MunchiWave

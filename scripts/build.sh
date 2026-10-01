@@ -39,7 +39,7 @@ rm -rf "$MODULE_DIR"
 mkdir -p "$MODULE_DIR"
 
 SRCS="src/standalone/main.cpp src/standalone/surface.cpp src/standalone/font.cpp \
-      src/engine/munchi_wave.cpp \
+      src/engine/munchi_wave.cpp src/engine/wave_card.cpp \
       src/engine/daisysp/adsr.cpp src/engine/daisysp/svf.cpp src/engine/daisysp/dcblock.cpp \
       src/engine/daisysp/oscillator.cpp"
 
@@ -70,3 +70,34 @@ rm -f "$TARBALL"
 ( cd dist && tar -czf "$(basename "$TARBALL")" munchi-wave )
 
 echo "Output: $MODULE_DIR/  Tarball: $TARBALL ($(du -h "$TARBALL" | cut -f1))"
+
+# ---- the sound generator: the same engine as a Signal Chain synth ----------
+SYNTH_DIR="dist/munchi-wave-synth"
+SYNTH_TARBALL="dist/munchi-wave-synth-module.tar.gz"
+rm -rf "$SYNTH_DIR"
+mkdir -p "$SYNTH_DIR/card"
+
+echo "Compiling sound generator..."
+# -fno-gnu-unique + --exclude-libs,ALL: no STB_GNU_UNIQUE symbols, so a new
+# dsp.so loads without restarting Move; --no-undefined: a missing symbol is a
+# build failure, not a module stuck on "Loading..."
+${CROSS_PREFIX}g++ -O2 -g -std=c++17 -shared -fPIC -fvisibility=hidden -fno-gnu-unique \
+    -Wall -Wno-vla -Wno-unused-variable -Wno-unused-but-set-variable -Wno-class-memaccess \
+    -Isrc/synth -Isrc/engine \
+    src/synth/wave_synth.cpp src/engine/wave_card.cpp \
+    src/engine/daisysp/adsr.cpp src/engine/daisysp/svf.cpp src/engine/daisysp/dcblock.cpp \
+    src/engine/daisysp/oscillator.cpp \
+    -o build/dsp.so \
+    -static-libstdc++ -static-libgcc -Wl,--exclude-libs,ALL -Wl,--no-undefined -lpthread -lm
+
+cat src/synth/module.json > "$SYNTH_DIR/module.json"
+cat build/dsp.so > "$SYNTH_DIR/dsp.so"
+cat src/synth/help.json > "$SYNTH_DIR/help.json"
+cat LICENSE > "$SYNTH_DIR/LICENSE"
+cat THIRD_PARTY.md > "$SYNTH_DIR/THIRD_PARTY.md"
+for f in build/card/*; do
+    cat "$f" > "$SYNTH_DIR/card/$(basename "$f")"
+done
+rm -f "$SYNTH_TARBALL"
+( cd dist && tar -czf "$(basename "$SYNTH_TARBALL")" munchi-wave-synth )
+echo "Output: $SYNTH_DIR/  Tarball: $SYNTH_TARBALL ($(du -h "$SYNTH_TARBALL" | cut -f1))"
