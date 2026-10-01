@@ -2,7 +2,7 @@
     "id": "munchi-wave",
     "name": "Munchi Wave",
     "abbrev": "MWAVE",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "CHOMPI WAVE 1.0 on Move: an 8-voice wavetable synth with a DJ filter, two LFOs, a 32-step sequencer, delay and reverb, and 14 factory presets. Takes over Move until you exit.",
     "author": "CHOMPI Club / Chase Bliss (CHOMPI WAVE, MIT) · port: charlesvestal",
     "license": "MIT",
