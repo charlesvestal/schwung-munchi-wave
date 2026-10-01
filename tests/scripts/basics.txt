@@ -1,0 +1,25 @@
+# defaults patch: C4, then A4
+1600 on 18
+2400 off 18
+2600 on 26
+3400 off 26
+# factory preset 1
+3800 slot 1
+3900 on 18
+4700 off 18
+# record a sequence: Loop, three keys, Loop, Play
+5200 on 34
+5250 off 34
+5300 on 15
+5400 off 15
+5500 on 19
+5600 off 19
+5700 on 28
+5800 off 28
+5900 on 34
+5950 off 34
+6000 on 33
+6050 off 33
+9000 on 33
+9050 off 33
+10000 end

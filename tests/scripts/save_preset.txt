@@ -1,0 +1,24 @@
+1600 slot 3
+1700 enc 3.0 25
+1800 menukey 1
+1850 on 31
+1860 off 31
+1900 menukey 0
+2000 on 20
+2010 off 20
+2100 menukey 1
+2150 menukey 0
+3500 slot 1
+3600 slot 10
+3700 on 18
+4500 off 18
+# chord level check
+5000 on 15
+5000 on 9
+5000 on 11
+5000 on 18
+6000 off 15
+6000 off 9
+6000 off 11
+6000 off 18
+12000 end
