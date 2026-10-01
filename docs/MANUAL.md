@@ -41,6 +41,10 @@ Wave**. Move stops and Munchi Wave takes over the whole device. The first launch
 copies the factory wavetables and presets into place. For the first second and a
 half the pads are ignored, as on the hardware.
 
+**Booting straight into it.** Munchi Wave is also a boot target: choose it in the
+Schwung web manager's **Boot** page (`http://move.local:7700/boot`) and Move
+starts in Munchi Wave. Leaving it then starts Schwung as usual.
+
 To leave, press **Back**, then **Back** again within three seconds. Move
 restarts. The sequence is lost on exit; presets and settings are kept.
 
@@ -50,16 +54,18 @@ restarts. The sequence is lost on exit; presets and settings are kept.
    frame 1.
 2. **Pick a preset.** Turn the **jog wheel**, or press **step buttons 1–14**.
    Step 15 is back to the defaults.
-3. **Change the wave.** Turn **knob 6 (Table)** to go through the seven tables.
-   Press **Right**, then turn **knob 1 (Frame)** to sweep through a table's 33
-   frames.
-4. **Shape it.** Press **Left** to get back. **Knob 2** is attack, **knob 3**
-   release, **knob 5** the filter (left: low-pass, right: high-pass), **knob 4**
+3. **Change the wave.** **Knob 1 (Table)** goes through the seven tables;
+   **knob 2 (Frame)** sweeps through a table's 33 frames. Turn it while a note
+   holds and the sound morphs.
+4. **Shape it.** **Knob 3** is the filter (left: low-pass, right: high-pass),
+   **knob 4** its resonance, **knobs 5 and 6** attack and release, **knob 7**
    delay (left) or reverb (right).
-5. **Make it move.** Press **Right**: **knob 2** is now the pitch LFO's depth,
-   **knob 3** the filter LFO's depth.
+5. **Make it move.** Press **Right** for the second page: pitch, then each LFO's
+   depth and rate, delay time, pan and the compressor. Turn up **knob 2 (Pitch
+   LFO)** or **knob 4 (Filter LFO)**.
 6. **Record a sequence.** Press **Loop** (it lights red), play a few pads one at
-   a time, press **Loop** again. Press **Play**. Change tempo with **knob 7**.
+   a time, press **Loop** again. Press **Play**. Change tempo with **knob 8**
+   (on page 1).
 7. **Keep it.** Hold **Shift**, tap **A#4** (top row, third black pad), tap a
    white pad to choose a slot, press **Shift** again. The patch is saved.
 
@@ -85,34 +91,40 @@ in [Settings](#10-settings) to play them dynamically.
 
 ## 5. The sound
 
-| Knob | Does | With Shift |
-|---|---|---|
-| **1 Pitch** | Fine tune, ±1 octave | Tune in semitone steps |
-| **Right**, **1 Frame** | Which of the table's 33 frames plays | Choose the table |
-| **2 Attack** | Fade-in, up to 5 s | Attack in big steps |
-| **Right**, **2 Pitch LFO** | Pitch LFO depth (up to ±2 semitones) | Pitch LFO rate |
-| **3 Release** | Fade-out after the key, up to 1 s | Release in big steps |
-| **Right**, **3 Filter LFO** | Filter LFO depth | Filter LFO rate |
-| **4 Space** | Middle is dry; left adds delay, right adds reverb | Delay time (also reverb size) |
-| **5 Filter** | Middle is open; left low-pass, right high-pass | Resonance |
-| **6 Table** | Choose the wavetable (1–7) | — |
-| **8 Pan** | Left / right | Output compressor |
-| **Volume** | Volume | Output compressor |
+Every sound control has a knob, on two pages of eight. **Left** and **Right**
+switch pages; the lit arrow is the way to the other one.
 
-**Left / Right** switch knobs 1–3 between their two pages; the lit arrow is the
-way to the other one.
+| Page 1 | Does | With Shift |
+|---|---|---|
+| **1 Table** | Choose the wavetable (1–7) | — |
+| **2 Frame** | Which of the table's 33 frames plays; morphs smoothly | — |
+| **3 Filter** | Middle is open; left low-pass, right high-pass | — |
+| **4 Resonance** | The filter's resonance | — |
+| **5 Attack** | Fade-in, up to 5 s | In big steps |
+| **6 Release** | Fade-out after the key, up to 1 s | In big steps |
+| **7 Space** | Middle is dry; left adds delay, right adds reverb | — |
+| **8 Tempo** | Sequencer tempo, 80–240 BPM | Step length |
+
+| Page 2 | Does | With Shift |
+|---|---|---|
+| **1 Pitch** | Fine tune, ±1 octave | In semitones |
+| **2 Pitch LFO** | Pitch LFO depth (up to ±2 semitones) | — |
+| **3 P.LFO rate** | Pitch LFO speed | — |
+| **4 Filter LFO** | Filter LFO depth | — |
+| **5 F.LFO rate** | Filter LFO speed | — |
+| **6 Delay time** | Also sets the reverb size | — |
+| **7 Pan** | Left / right | — |
+| **8 Comp** | Output compressor; the second half saturates | — |
+| **Volume knob** | Volume | Compressor |
 
 **LFO switches:** **Track 2** turns the pitch LFO on or off, **Track 3** the
 filter LFO (also Shift + C#4 / D#4). Both run all the time; their depth knobs
 set how much you hear.
 
-**Output compressor** (Shift + knob 8 or Shift + Volume): the first half
-compresses, the second half saturates harder and harder.
-
-**Resets:** **Delete + touch** a knob puts it back to its default: knob 1 (pitch
-or frame), 2 (attack, or pitch LFO depth and rate), 3 (release, or filter LFO
-depth and rate), 4 or 5 (all the effects), 7 (tempo and step length), 8 or
-Volume (pan or volume, and the compressor).
+**Resets:** **Delete + touch** a knob puts it back to its default: Frame,
+Pitch, Attack, Release, either LFO (depth and rate together), Tempo (and step
+length), Pan, Volume (and the compressor); any effect knob resets all the
+effects.
 
 ## 6. The sequencer
 
@@ -132,8 +144,8 @@ them back in a loop.
 Up to 32 steps. Recording adds to the end of the sequence, also while it plays.
 **Rec** does the same as Loop.
 
-**Tempo:** **knob 7**, 80–240 BPM; **Track 1** is tap tempo (tap twice) and
-flashes the beat. **Shift + knob 7** sets the step length: 1/4, dotted 1/8, 1/8
+**Tempo:** **knob 8** on page 1, 80–240 BPM; **Track 1** is tap tempo (tap
+twice) and flashes the beat. **Shift + Tempo** sets the step length: 1/4, dotted 1/8, 1/8
 (the default), 1/8 triplet or 1/16. It changes on the next step.
 
 **Gate:** how long each step's note sounds, as a share of the step. Hold
@@ -178,7 +190,8 @@ row 2   .  OCT-  OCT+   .  10%   50%  100%  .
 | **F#4 / G#4 / A#4** | Erase / copy / save a preset |
 
 The **white keys** are the preset slots: C3 is slot 1 up to B4, slot 14; C5 is
-the defaults. The knobs do their Shift jobs ([section 5](#5-the-sound)).
+the defaults. Pitch, Attack, Release and Tempo do their Shift gestures
+([section 5](#5-the-sound)).
 
 ## 9. Wavetables: the card
 
@@ -250,16 +263,10 @@ the playing step and length, the tempo and the step length.
 | Control | Alone | With Shift |
 |---|---|---|
 | Pads | play | menu functions / preset slots |
-| Knob 1 | Pitch (Right: Frame) | Pitch in semitones (Right: Table) |
-| Knob 2 | Attack (Right: Pitch LFO depth) | Attack, coarse (Right: Pitch LFO rate) |
-| Knob 3 | Release (Right: Filter LFO depth) | Release, coarse (Right: Filter LFO rate) |
-| Knob 4 | Space | Delay time |
-| Knob 5 | Filter | Resonance |
-| Knob 6 | Table | Table |
-| Knob 7 | Tempo | Step length |
-| Knob 8 | Pan | Compressor |
+| Knobs, page 1 | Table, Frame, Filter, Resonance, Attack, Release, Space, Tempo | Attack and Release in big steps, Tempo → step length |
+| Knobs, page 2 | Pitch, Pitch LFO, P.LFO rate, Filter LFO, F.LFO rate, Delay time, Pan, Comp | Pitch in semitones |
 | Volume | Volume | Compressor |
-| Left / Right | knob 1–3 page | — |
+| Left / Right | knob page | — |
 | Up / Down | octave | — |
 | Jog / steps 1–15 | presets | — |
 | Jog click / Menu | settings | — |
@@ -274,9 +281,11 @@ the playing step and length, the tempo and the step length.
 
 ## 14. Differences from a real CHOMPI
 
-- **Controls.** Move has more knobs and no encoder clicks, so pages are on
-  Left/Right, clicks are Delete + touch, tap tempo is Track 1, and the wavetable
-  (a Shift job on the CHOMPI) also has its own knob. Shift is the CHOMPI key in
+- **Controls.** The CHOMPI has six encoders with pages and a Shift layer that
+  holds half the sound (table, resonance, LFO rates, delay time, compressor).
+  Move gives every control its own knob on two pages instead, keeping Shift for
+  the encoders' extra gestures. Encoder clicks are Delete + touch; tap tempo is
+  Track 1. Shift is the CHOMPI key in
   play mode; Sample is the CHOMPI key in record mode.
 - **Level.** WAVE's engine is very quiet by design (the CHOMPI's analog output
   made up the level), so Munchi Wave adds fixed gain with a soft limiter.

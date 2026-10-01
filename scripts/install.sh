@@ -19,5 +19,6 @@ fi
 # upload beside, then rename: a running Munchi Wave holds the old binary open
 # ("text file busy" on a plain copy) and keeps it until it exits
 scp dist/munchi-wave/standalone "$HOST:$DEST/standalone.new"
-ssh "$HOST" "chmod +x $DEST/standalone.new && mv -f $DEST/standalone.new $DEST/standalone"
+scp scripts/boot-entry.sh "$HOST:$DEST/boot-entry.sh"
+ssh "$HOST" "chmod +x $DEST/standalone.new $DEST/boot-entry.sh && mv -f $DEST/standalone.new $DEST/standalone"
 echo "Installed to $DEST. Launch it from Schwung's Tools menu."

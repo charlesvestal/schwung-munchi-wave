@@ -10,9 +10,11 @@
  *   Sample        the CHOMPI key in record mode: a rest while recording the
  *                 sequence, otherwise mute it while held
  *   Play / Loop   the sequencer's two keys (Rec is a second Loop)
- *   knobs 1-8     Pitch, Attack, Release, Space, Filter, Table, Tempo, Pan;
- *                 Left/Right flip knobs 1-3 to Frame, Pitch LFO, Filter LFO
- *   volume knob   Volume;  Shift + any knob = the menu page's encoder
+ *   knobs 1-8     page 1: Table, Frame, Filter, Resonance, Attack, Release,
+ *                 Space, Tempo; page 2 (Right): Pitch, Pitch LFO depth/rate,
+ *                 Filter LFO depth/rate, Delay time, Pan, Compressor
+ *   volume knob   Volume;  Shift: pitch in semitones, coarse attack/release,
+ *                 step length (the menu page's encoder gestures)
  *   Delete+touch  an encoder click (reset)
  *   Track 1-3     tap tempo, pitch LFO on/off, filter LFO on/off
  *   steps 1-15    presets 1-14 and the defaults; jog browses them
@@ -35,6 +37,8 @@ class Surface
     void Tick(uint8_t *spi);
     void InvalidateLeds();
     bool WantsExit() const { return exit_; }
+    /** Tests: draw the current screen and return its pixels (128 x 64). */
+    const uint8_t *TestScreen() { Draw(); return disp_.Pixels(); }
     int  WriteAllOff(uint8_t *spi, int start);
 
   private:
@@ -45,7 +49,9 @@ class Surface
     void OnKnobTouch(int knob, bool on);
     void OnButton(int cc, bool press);
     void Show(const char *name, const char *value);
-    void KnobText(int knob, bool menu, char *name, char *value);
+    int   KnobParam(int knob, bool shift) const;
+    void  ParamText(int param, char *value);
+    float ParamValue(int param);
     void SettingsActivate(int dir);
     int  NextPreset(int from, int dir);
 

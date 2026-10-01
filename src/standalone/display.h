@@ -93,6 +93,7 @@ class Display
     }
 
     bool AtFrameStart() const { return phase_ == 0; }
+    const uint8_t *Pixels() const { return fb_; } // tests
 
     /** One SPI tick's worth of display: writes status + slice into the
      *  output region. Call once per transfer. Returns true at phase 0, the

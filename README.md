@@ -34,8 +34,8 @@ sequencer, presets and wavetables.
 |---|---|
 | Pads | the keyboard, two octaves as piano rows |
 | Jog / steps 1–15 | presets (15 = defaults) |
-| Knobs 1–8 | Pitch, Attack, Release, Space, Filter, Table, Tempo, Pan |
-| Left / Right | knobs 1–3 become Frame, Pitch LFO, Filter LFO |
+| Knobs, page 1 | Table, Frame, Filter, Resonance, Attack, Release, Space, Tempo |
+| Knobs, page 2 (Right) | Pitch, Pitch LFO, P.LFO rate, Filter LFO, F.LFO rate, Delay time, Pan, Comp |
 | Volume knob | Volume |
 | Loop / Play | record / play the sequence |
 | Sample | a rest while recording; mute while held |

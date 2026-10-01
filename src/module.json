@@ -7,5 +7,10 @@
     "author": "CHOMPI Club / Chase Bliss (CHOMPI WAVE, MIT) · port: charlesvestal",
     "license": "MIT",
     "component_type": "tool",
-    "standalone": true
+    "standalone": true,
+    "boot_target": {
+        "id": "munchi-wave",
+        "name": "Munchi Wave",
+        "exec": "boot-entry.sh"
+    }
 }

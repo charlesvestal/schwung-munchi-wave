@@ -174,80 +174,96 @@ void Surface::OnStep(int step, bool on)
     }
 }
 
-/* Knob -> CHOMPI encoder and page. K6 is the menu's wavetable select, given
- * its own knob because a wavetable synth's table wants to be at hand. */
+/* ---- knobs ----------------------------------------------------------------
+ * Every sound control has a knob: two pages of eight (Left/Right), plus the
+ * volume knob. Each is a CHOMPI encoder on one of its pages, reached the way
+ * the play page reached it or the way the menu page did. Shift keeps only the
+ * menu's extra gestures: pitch in semitones, coarse attack/release, and the
+ * tempo knob's step length. */
+enum Param
+{
+    P_TABLE, P_FRAME, P_FILTER, P_RES, P_ATTACK, P_RELEASE, P_SPACE, P_TEMPO,
+    P_PITCH, P_PLFO_D, P_PLFO_R, P_FLFO_D, P_FLFO_R, P_TIME, P_PAN, P_COMP,
+    P_VOLUME, P_PITCH_ST, P_ATTACK_C, P_RELEASE_C, P_STEP, P_NONE,
+};
+
+struct ParamDef
+{
+    const char *name, *abbrev;
+    int         enc, page;
+    bool        menu;
+    int         shift;
+    int         click; // Delete + touch: the encoder click, or -1
+};
+
+static const ParamDef kParams[] = {
+    {"TABLE", "TAB", 0, 1, true, P_NONE, -1},
+    {"FRAME", "FRM", 0, 1, false, P_NONE, ENC_4_SW},
+    {"FILTER", "FLT", 3, 1, false, P_NONE, ENC_3_SW},
+    {"RESONANCE", "RES", 3, 1, true, P_NONE, ENC_3_SW},
+    {"ATTACK", "ATK", 1, 0, false, P_ATTACK_C, ENC_1_SW},
+    {"RELEASE", "REL", 2, 0, false, P_RELEASE_C, ENC_2_SW},
+    {"SPACE", "SPC", 3, 0, false, P_NONE, ENC_3_SW},
+    {"TEMPO", "BPM", 4, 0, false, P_STEP, ENC_5_SW},
+    {"PITCH", "PCH", 0, 0, false, P_PITCH_ST, ENC_4_SW},
+    {"PITCH LFO", "PLF", 1, 1, false, P_NONE, ENC_1_SW},
+    {"P.LFO RATE", "PRT", 1, 1, true, P_NONE, ENC_1_SW},
+    {"FILTER LFO", "FLF", 2, 1, false, P_NONE, ENC_2_SW},
+    {"F.LFO RATE", "FRT", 2, 1, true, P_NONE, ENC_2_SW},
+    {"DELAY TIME", "TIM", 3, 0, true, P_NONE, ENC_3_SW},
+    {"PAN", "PAN", 5, 1, false, P_NONE, ENC_6_SW},
+    {"COMP", "CMP", 5, 0, true, P_NONE, -1},
+    {"VOLUME", "VOL", 5, 0, false, P_COMP, ENC_6_SW},
+    {"PITCH STEP", "PCH", 0, 0, true, P_NONE, -1},
+    {"ATTACK", "ATK", 1, 0, true, P_NONE, -1},
+    {"RELEASE", "REL", 2, 0, true, P_NONE, -1},
+    {"STEP LENGTH", "STP", 4, 0, true, P_NONE, -1},
+};
+
+static const int kPage[2][8] = {
+    {P_TABLE, P_FRAME, P_FILTER, P_RES, P_ATTACK, P_RELEASE, P_SPACE, P_TEMPO},
+    {P_PITCH, P_PLFO_D, P_PLFO_R, P_FLFO_D, P_FLFO_R, P_TIME, P_PAN, P_COMP},
+};
+
+int Surface::KnobParam(int knob, bool shift) const
+{
+    int p = knob == 8 ? P_VOLUME : kPage[page_][knob];
+    if(shift && kParams[p].shift != P_NONE)
+        p = kParams[p].shift;
+    return p;
+}
+
 void Surface::OnKnob(int knob, int delta)
 {
-    if(delta == 0)
+    if(delta == 0 || knob < 0 || knob > 8)
         return;
-    bool menu = eng_.MenuActive();
-    switch(knob)
-    {
-        case 0: eng_.Encoder(0, page_, delta, menu); break;
-        case 1: eng_.Encoder(1, page_, delta, menu); break;
-        case 2: eng_.Encoder(2, page_, delta, menu); break;
-        case 3: eng_.Encoder(3, 0, delta, menu); break;
-        case 4: eng_.Encoder(3, 1, delta, menu); break;
-        case 5:
-            eng_.Encoder(0, 1, delta, true);
-            eng_.SetKnobPage(0, page_);
-            break;
-        case 6: eng_.Encoder(4, 0, delta, menu); break;
-        case 7: eng_.Encoder(5, 1, delta, menu); break;
-        case 8: eng_.Encoder(5, 0, delta, menu); break;
-    }
-    char name[24], value[24];
-    KnobText(knob, menu, name, value);
-    Show(name, value);
+    int p = KnobParam(knob, shift_);
+    const ParamDef &d = kParams[p];
+    eng_.Encoder(d.enc, d.page, delta, d.menu);
+    char value[24];
+    ParamText(p, value);
+    Show(d.name, value);
 }
 
 void Surface::OnKnobTouch(int knob, bool on)
 {
-    if(!on)
+    if(!on || knob > 8)
         return;
+    int p = KnobParam(knob, false);
+    const ParamDef &d = kParams[p];
     if(delete_)
     {
-        // Delete + touch = that encoder's click on the menu page: a reset
-        switch(knob)
-        {
-            case 0:
-                eng_.SetKnobPage(0, page_);
-                eng_.Click(ENC_4_SW);
-                Show(page_ ? "FRAME" : "PITCH", "RESET");
-                break;
-            case 1:
-                eng_.SetKnobPage(1, page_);
-                eng_.Click(ENC_1_SW);
-                Show(page_ ? "PITCH LFO" : "ATTACK", "RESET");
-                break;
-            case 2:
-                eng_.SetKnobPage(2, page_);
-                eng_.Click(ENC_2_SW);
-                Show(page_ ? "FILTER LFO" : "RELEASE", "RESET");
-                break;
-            case 3:
-            case 4:
-                eng_.Click(ENC_3_SW);
-                Show("FX", "RESET");
-                break;
-            case 6:
-                eng_.Click(ENC_5_SW);
-                Show("TEMPO", "RESET");
-                break;
-            case 7:
-            case 8:
-                eng_.SetKnobPage(5, knob == 7 ? 1 : 0);
-                eng_.Click(ENC_6_SW);
-                Show(knob == 7 ? "PAN" : "VOLUME", "RESET");
-                break;
-        }
+        if(d.click < 0)
+            return;
+        eng_.SetKnobPage(d.enc, d.page);
+        eng_.Click(d.click);
+        Show(d.click == ENC_3_SW ? "EFFECTS" : d.name, "RESET");
         return;
     }
-    if(knob > 8)
-        return;
-    char name[24], value[24];
-    KnobText(knob, eng_.MenuActive(), name, value);
-    Show(name, value);
+    p = KnobParam(knob, shift_);
+    char value[24];
+    ParamText(p, value);
+    Show(kParams[p].name, value);
 }
 
 void Surface::OnButton(int cc, bool press)
@@ -296,9 +312,7 @@ void Surface::OnButton(int cc, bool press)
             if(press)
             {
                 page_ = cc == CC_RIGHT ? 1 : 0;
-                for(int k = 0; k < 3; k++)
-                    e.SetKnobPage(k, page_);
-                Show("KNOBS 1-3", page_ ? "FRM PLFO FLFO" : "PCH ATK REL");
+                Show("KNOBS", page_ ? "PAGE 2" : "PAGE 1");
             }
             break;
 
@@ -411,129 +425,17 @@ void Surface::SettingsActivate(int dir)
 static void pct(char *out, float v) { snprintf(out, 24, "%d%%", (int)lrintf(v * 100.f)); }
 static float lfo_hz(float v) { return .14f * powf(65.41f / .14f, v); }
 
-void Surface::KnobText(int knob, bool menu, char *name, char *value)
+void Surface::ParamText(int p, char *value)
 {
     myEngine &x = eng_.Eng();
-    if(knob == 5)
+    switch(p)
     {
-        strcpy(name, "TABLE");
-        snprintf(value, 24, "%d / %d", x.getTable() + 1, eng_.TablesLoaded());
-        return;
-    }
-    if(menu)
-    {
-        switch(knob)
+        case P_TABLE:
+            snprintf(value, 24, "%d / %d", x.getTable() + 1, eng_.TablesLoaded());
+            return;
+        case P_FRAME: snprintf(value, 24, "%d / 33", x.getCycle() + 1); return;
+        case P_FILTER:
         {
-            case 0:
-                if(page_ == 0)
-                {
-                    strcpy(name, "PITCH STEP");
-                    snprintf(value, 24, "%+d ST", (int)lrintf((eng_.EncValue(0, 0) - .5f) * 24.f));
-                }
-                else
-                {
-                    strcpy(name, "TABLE");
-                    snprintf(value, 24, "%d / %d", x.getTable() + 1, eng_.TablesLoaded());
-                }
-                return;
-            case 1:
-                if(page_ == 0)
-                {
-                    strcpy(name, "ATTACK");
-                    snprintf(value, 24, "%.2fs", eng_.EncValue(0, 1) * 5.f);
-                }
-                else
-                {
-                    strcpy(name, "PITCH LFO RATE");
-                    snprintf(value, 24, "%.2f HZ", lfo_hz(eng_.PitchLfoRate()));
-                }
-                return;
-            case 2:
-                if(page_ == 0)
-                {
-                    strcpy(name, "RELEASE");
-                    snprintf(value, 24, "%.2fs", eng_.EncValue(0, 2));
-                }
-                else
-                {
-                    strcpy(name, "FILTER LFO RATE");
-                    snprintf(value, 24, "%.2f HZ", lfo_hz(eng_.FilterLfoRate()));
-                }
-                return;
-            case 3:
-                strcpy(name, "DELAY TIME");
-                pct(value, eng_.DelayTime());
-                return;
-            case 4:
-                strcpy(name, "RESONANCE");
-                pct(value, eng_.Resonance());
-                return;
-            case 6:
-                strcpy(name, "STEP LENGTH");
-                strcpy(value, kDivNames[eng_.Clock().divPos() % 5]);
-                return;
-            default:
-                strcpy(name, "COMP");
-                pct(value, eng_.FinalComp());
-                return;
-        }
-    }
-    switch(knob)
-    {
-        case 0:
-            if(page_ == 0)
-            {
-                strcpy(name, "PITCH");
-                snprintf(value, 24, "%+.1f ST", (eng_.EncValue(0, 0) - .5f) * 24.f);
-            }
-            else
-            {
-                strcpy(name, "FRAME");
-                snprintf(value, 24, "%d / 33", x.getCycle() + 1);
-            }
-            return;
-        case 1:
-            if(page_ == 0)
-            {
-                strcpy(name, "ATTACK");
-                snprintf(value, 24, "%.2fs", eng_.EncValue(0, 1) * 5.f);
-            }
-            else
-            {
-                strcpy(name, "PITCH LFO");
-                pct(value, eng_.EncValue(1, 1));
-            }
-            return;
-        case 2:
-            if(page_ == 0)
-            {
-                strcpy(name, "RELEASE");
-                snprintf(value, 24, "%.2fs", eng_.EncValue(0, 2));
-            }
-            else
-            {
-                strcpy(name, "FILTER LFO");
-                pct(value, eng_.EncValue(1, 2));
-            }
-            return;
-        case 3:
-        {
-            float v = eng_.EncValue(0, 3);
-            if(fabsf(v - .5f) < .01f)
-            {
-                strcpy(name, "SPACE");
-                strcpy(value, "DRY");
-            }
-            else
-            {
-                strcpy(name, v < .5f ? "DELAY" : "REVERB");
-                pct(value, fabsf(v - .5f) * 2.f);
-            }
-            return;
-        }
-        case 4:
-        {
-            strcpy(name, "FILTER");
             float v = eng_.EncValue(1, 3);
             if(fabsf(v - .5f) < .02f)
                 strcpy(value, "OPEN");
@@ -542,26 +444,71 @@ void Surface::KnobText(int knob, bool menu, char *name, char *value)
                          (int)lrintf(fabsf(v - .5f) * 200.f));
             return;
         }
-        case 6:
-            strcpy(name, "TEMPO");
-            snprintf(value, 24, "%d BPM", eng_.Clock().getTempo() / 2);
-            return;
-        case 7:
+        case P_RES: pct(value, eng_.Resonance()); return;
+        case P_ATTACK:
+        case P_ATTACK_C: snprintf(value, 24, "%.2fs", eng_.EncValue(0, 1) * 5.f); return;
+        case P_RELEASE:
+        case P_RELEASE_C: snprintf(value, 24, "%.2fs", eng_.EncValue(0, 2)); return;
+        case P_SPACE:
         {
-            strcpy(name, "PAN");
-            float p = eng_.EncValue(1, 5);
-            if(fabsf(p - .5f) < .01f)
-                strcpy(value, "C");
+            float v = eng_.EncValue(0, 3);
+            if(fabsf(v - .5f) < .01f)
+                strcpy(value, "DRY");
             else
-                snprintf(value, 24, "%s%d", p < .5f ? "L" : "R",
-                         (int)lrintf(fabsf(p - .5f) * 200.f));
+                snprintf(value, 24, "%s %d%%", v < .5f ? "DLY" : "REV",
+                         (int)lrintf(fabsf(v - .5f) * 200.f));
             return;
         }
-        default:
-            strcpy(name, "VOLUME");
-            pct(value, eng_.EncValue(0, 5));
+        case P_TEMPO: snprintf(value, 24, "%d BPM", eng_.Clock().getTempo() / 2); return;
+        case P_STEP: strcpy(value, kDivNames[eng_.Clock().divPos() % 5]); return;
+        case P_PITCH: snprintf(value, 24, "%+.1f ST", (eng_.EncValue(0, 0) - .5f) * 24.f); return;
+        case P_PITCH_ST:
+            snprintf(value, 24, "%+d ST", (int)lrintf((eng_.EncValue(0, 0) - .5f) * 24.f));
             return;
+        case P_PLFO_D: pct(value, eng_.EncValue(1, 1)); return;
+        case P_PLFO_R: snprintf(value, 24, "%.2f HZ", lfo_hz(eng_.PitchLfoRate())); return;
+        case P_FLFO_D: pct(value, eng_.EncValue(1, 2)); return;
+        case P_FLFO_R: snprintf(value, 24, "%.2f HZ", lfo_hz(eng_.FilterLfoRate())); return;
+        case P_TIME: pct(value, eng_.DelayTime()); return;
+        case P_PAN:
+        {
+            float v = eng_.EncValue(1, 5);
+            if(fabsf(v - .5f) < .01f)
+                strcpy(value, "C");
+            else
+                snprintf(value, 24, "%s%d", v < .5f ? "L" : "R", (int)lrintf(fabsf(v - .5f) * 200.f));
+            return;
+        }
+        case P_COMP: pct(value, eng_.FinalComp()); return;
+        case P_VOLUME: pct(value, eng_.EncValue(0, 5)); return;
     }
+    value[0] = 0;
+}
+
+float Surface::ParamValue(int p)
+{
+    myEngine &x = eng_.Eng();
+    switch(p)
+    {
+        case P_TABLE:
+            return eng_.TablesLoaded() > 1 ? x.getTable() / (float)(eng_.TablesLoaded() - 1) : 0.f;
+        case P_FRAME: return x.getCycle() / 32.f;
+        case P_FILTER: return eng_.EncValue(1, 3);
+        case P_RES: return eng_.Resonance();
+        case P_ATTACK: return eng_.EncValue(0, 1);
+        case P_RELEASE: return eng_.EncValue(0, 2);
+        case P_SPACE: return eng_.EncValue(0, 3);
+        case P_TEMPO: return (eng_.Clock().getTempo() - 160) / 320.f;
+        case P_PITCH: return eng_.EncValue(0, 0);
+        case P_PLFO_D: return eng_.EncValue(1, 1);
+        case P_PLFO_R: return eng_.PitchLfoRate();
+        case P_FLFO_D: return eng_.EncValue(1, 2);
+        case P_FLFO_R: return eng_.FilterLfoRate();
+        case P_TIME: return eng_.DelayTime();
+        case P_PAN: return eng_.EncValue(1, 5);
+        case P_COMP: return eng_.FinalComp();
+    }
+    return 0.f;
 }
 
 /* ---- LEDs ----------------------------------------------------------------- */
@@ -890,23 +837,13 @@ void Surface::DrawMain()
     }
     else
     {
-        static const char *kn[2][8] = {
-            {"PCH", "ATK", "REL", "SPC", "FLT", "TAB", "BPM", "PAN"},
-            {"FRM", "PLF", "FLF", "SPC", "FLT", "TAB", "BPM", "PAN"}};
-        float vals[8] = {page_ ? x.getCycle() / 32.f : eng_.EncValue(0, 0),
-                         page_ ? eng_.EncValue(1, 1) : eng_.EncValue(0, 1),
-                         page_ ? eng_.EncValue(1, 2) : eng_.EncValue(0, 2),
-                         eng_.EncValue(0, 3),
-                         eng_.EncValue(1, 3),
-                         eng_.TablesLoaded() > 1 ? x.getTable() / (float)(eng_.TablesLoaded() - 1) : 0.f,
-                         (eng_.Clock().getTempo() - 160) / 320.f,
-                         eng_.EncValue(1, 5)};
         for(int i = 0; i < 8; i++)
         {
+            int p  = kPage[page_][i];
             int cx = (i % 4) * 32, cy = y + (i / 4) * 13;
-            disp_.Text(cx, cy, kn[page_][i]);
+            disp_.Text(cx, cy, kParams[p].abbrev);
             disp_.Frame(cx, cy + 8, 28, 3);
-            disp_.HLine(cx, cy + 9, 1 + (int)(vals[i] * 27));
+            disp_.HLine(cx, cy + 9, 1 + (int)(ParamValue(p) * 27));
         }
     }
 
