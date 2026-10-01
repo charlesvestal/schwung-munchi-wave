@@ -68,6 +68,19 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin main
           git checkout -B main origin/main
-          printf '{\n  "version": "%s",\n  "download_url": "%s",\n  "install_path": "modules/tools/munchi-wave"\n}\n' "$VERSION" "$URL" > release.json
+          SURL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/munchi-wave-synth-module.tar.gz"
+          # top level: the tool (what a custom install by repo URL reads);
+          # modules: one entry per catalog id (what the catalog resolves)
+          cat > release.json <<JSON
+          {
+            "version": "$VERSION",
+            "download_url": "$URL",
+            "install_path": "modules/tools/munchi-wave",
+            "modules": {
+              "munchi-wave": {"version": "$VERSION", "download_url": "$URL"},
+              "munchi-wave-synth": {"version": "$VERSION", "download_url": "$SURL"}
+            }
+          }
+          JSON
           git add release.json
           git diff --cached --quiet || { git commit -m "release ${GITHUB_REF_NAME}: update release.json"; git push origin main; }

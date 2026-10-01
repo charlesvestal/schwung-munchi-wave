@@ -1,5 +1,9 @@
 {
   "version": "0.2.0",
   "download_url": "https://github.com/charlesvestal/schwung-munchi-wave/releases/download/v0.2.0/munchi-wave-module.tar.gz",
-  "install_path": "modules/tools/munchi-wave"
+  "install_path": "modules/tools/munchi-wave",
+  "modules": {
+    "munchi-wave": {"version": "0.2.0", "download_url": "https://github.com/charlesvestal/schwung-munchi-wave/releases/download/v0.2.0/munchi-wave-module.tar.gz"},
+    "munchi-wave-synth": {"version": "0.2.0", "download_url": "https://github.com/charlesvestal/schwung-munchi-wave/releases/download/v0.2.0/munchi-wave-synth-module.tar.gz"}
+  }
 }
