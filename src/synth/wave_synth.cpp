@@ -295,9 +295,12 @@ static bool json_number(const char *json, const char *key, float *out)
 static void *v2_create_instance(const char *module_dir, const char *json_defaults)
 {
     (void)json_defaults;
-    WaveSynth *s = new(std::nothrow) WaveSynth();
-    if(!s)
+    // WAVE's classes leave members to the CHOMPI's zeroed RAM: zero the
+    // memory, then construct in it
+    void *mem = calloc(1, sizeof(WaveSynth));
+    if(!mem)
         return nullptr;
+    WaveSynth *s = new(mem) WaveSynth();
     s->module_dir = module_dir ? module_dir : ".";
     for(int k = 0; k < K_COUNT; k++)
         s->p[k] = kDefs[k].def;
@@ -316,7 +319,8 @@ static void v2_destroy_instance(void *instance)
     delete s->reverb;
     free(s->del_mem);
     free(s->tables);
-    delete s;
+    s->~WaveSynth();
+    free(s);
 }
 
 static void v2_on_midi(void *instance, const uint8_t *msg, int len, int source)
